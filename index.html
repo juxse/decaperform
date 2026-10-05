@@ -6,436 +6,210 @@
   <title>DecaPerform</title>
   <!-- SUPABASE SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --bg: #040a16;
-      --p: #0082c3;
-      --c: #38d0ff;
-      --t: #e8f4ff;
-      --m: #8fb3d1;
-      --card: rgba(9, 22, 45, 0.85);
-      --r: #ff4d6d;
-      --g: #3dffa8;
-      box-sizing: border-box;
-    }
+  
+<style>
+:root{
+  --bg:#050914;
+  --bg-2:#07111f;
+  --panel:rgba(11,20,35,.78);
+  --panel-strong:rgba(13,24,42,.92);
+  --panel-soft:rgba(15,29,50,.62);
+  --line:rgba(105,150,196,.16);
+  --line-strong:rgba(72,170,255,.30);
+  --cyan:#46d9ff;
+  --blue:#1688ff;
+  --blue-2:#0d63c9;
+  --text:#f3f8ff;
+  --muted:#89a3bf;
+  --muted-2:#607b98;
+  --green:#42e7a4;
+  --red:#ff607b;
+  --gold:#ffd45a;
+  --shadow:0 24px 70px rgba(0,0,0,.30);
+  --radius:18px;
+  box-sizing:border-box;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;padding:0;width:100%;min-height:100%;
+  background:
+    radial-gradient(900px 500px at 70% -10%,rgba(22,136,255,.13),transparent 65%),
+    radial-gradient(700px 500px at -10% 80%,rgba(70,217,255,.07),transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:14px;line-height:1.45;overflow-x:hidden;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:linear-gradient(to bottom,black,transparent 85%);
+}
+.hide{display:none!important}
+h1,h2{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.02em}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.logo{font-size:20px;font-weight:850;color:#fff;display:flex;align-items:center;letter-spacing:-.04em}
+.logo b{color:var(--cyan)}
+.logo i{
+  width:12px;height:12px;background:linear-gradient(135deg,var(--cyan),var(--blue));
+  transform:rotate(45deg);margin-right:10px;border-radius:3px;
+  box-shadow:0 0 18px rgba(70,217,255,.6)
+}
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+/* AUTH */
+#auth{
+  min-height:100vh;min-height:100dvh;display:grid;place-items:center;
+  padding:28px;
+}
+.box{
+  width:min(440px,100%);padding:36px;
+  background:linear-gradient(145deg,rgba(15,29,49,.92),rgba(7,15,28,.92));
+  border:1px solid var(--line-strong);border-radius:24px;
+  box-shadow:var(--shadow),0 0 90px rgba(22,136,255,.09);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+.box p{color:var(--muted);margin:8px 0 24px;font-size:13px}
+label{
+  display:block;font-size:10px;letter-spacing:.12em;color:var(--muted);
+  margin:16px 0 7px;text-transform:uppercase;font-weight:750
+}
+input,select{
+  width:100%;padding:12px 14px;background:rgba(4,12,24,.78);
+  border:1px solid var(--line);border-radius:12px;color:var(--text);
+  outline:none;transition:.2s;border-color:var(--line)
+}
+input::placeholder{color:#526b86}
+input:focus,select:focus{
+  border-color:rgba(70,217,255,.65);
+  box-shadow:0 0 0 3px rgba(70,217,255,.08),0 0 24px rgba(70,217,255,.06)
+}
+select{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg fill='%2346d9ff' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:36px
+}
+button{
+  border:1px solid transparent;border-radius:11px;padding:10px 14px;
+  font-weight:750;letter-spacing:.02em;color:#fff;
+  background:linear-gradient(135deg,var(--blue),#0ab7e8);
+  transition:transform .16s ease,box-shadow .2s ease,filter .2s ease,border-color .2s ease;
+}
+button:hover{filter:brightness(1.08);box-shadow:0 10px 28px rgba(22,136,255,.18)}
+button:active{transform:translateY(1px) scale(.985)}
+button.ghost{
+  background:rgba(10,22,39,.62);border-color:var(--line);color:#9db6cf;
+}
+button.ghost:hover{border-color:rgba(70,217,255,.32);color:#eaf7ff;background:rgba(17,37,61,.75)}
+button.ghost.on{
+  background:rgba(22,136,255,.16);border-color:rgba(70,217,255,.52);
+  color:#fff;box-shadow:inset 0 0 20px rgba(70,217,255,.05),0 0 18px rgba(70,217,255,.08)
+}
+button.danger{background:rgba(255,96,123,.07);border-color:rgba(255,96,123,.35);color:#ff7188;padding:7px 10px;font-size:11px}
+button.danger:hover{background:rgba(255,96,123,.14);box-shadow:none}
+.full{width:100%;margin-top:20px;padding:13px}
+.sw{margin-top:18px;text-align:center;color:var(--muted);cursor:pointer;font-size:12px}
+.sw u{color:var(--cyan);text-decoration:none}
+#err{color:var(--red);font-size:12px;margin-top:10px;min-height:16px;text-align:center}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      color: var(--t);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.45;
-      overflow-x: hidden;
-      background-image: radial-gradient(circle at 20% 0, #0a2a55 0, transparent 55%),
-                        radial-gradient(circle at 90% 100%, #06335f 0, transparent 50%);
-      background-attachment: fixed;
-    }
+/* APP SHELL — PREMIUM SPORTS ANALYTICS */
+#app{display:grid;grid-template-rows:72px 1fr;min-height:100vh;min-height:100dvh}
+header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 32px;border-bottom:1px solid var(--line);background:rgba(5,9,20,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+.header-actions{display:flex!important;gap:8px!important;align-items:center}.header-actions .ghost{padding:8px 11px!important;font-size:11px!important}
+.chip{padding:7px 12px;border:1px solid var(--line);border-radius:999px;color:#a9c0d7;font-size:11px;background:rgba(11,25,43,.65);white-space:nowrap;max-width:300px;overflow:hidden;text-overflow:ellipsis}.chip b{color:#e9f7ff}
+main{display:block;width:100%;min-height:0;background:radial-gradient(circle at 50% -10%,rgba(0,130,195,.10),transparent 34%)}
+.dashboard-shell{max-width:1540px;margin:0 auto;padding:26px 30px 40px}
+.dashboard-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}
+.toolbar-title{display:flex;align-items:flex-end;gap:12px}.eyebrow{font-size:10px;letter-spacing:.18em;color:#6f8ba5;font-weight:850;text-transform:uppercase}.page-title{font-size:24px;font-weight:900;letter-spacing:-.04em;color:#eff9ff}.period-pill{padding:7px 11px;border:1px solid rgba(105,150,196,.18);border-radius:999px;color:#8faac3;background:rgba(10,24,41,.68);font-size:10px;font-weight:750}
+.toolbar-actions{display:flex;align-items:center;gap:8px}.toolbar-actions .control-inline{display:flex;align-items:center;gap:6px;padding:4px;border:1px solid var(--line);border-radius:12px;background:rgba(8,18,31,.72)}
+.control-inline button{padding:7px 9px;font-size:9px}.control-inline button.on{background:rgba(0,130,195,.18);border-color:rgba(56,208,255,.35);color:#eafaff}
+.period-control{display:flex;align-items:center;gap:7px}.period-control select{min-width:150px}
+.section-label{font-size:10px;color:#7893ad;letter-spacing:.17em;text-transform:uppercase;font-weight:850;margin:0 0 9px}
+.overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.metric-card{position:relative;overflow:hidden;min-height:112px;padding:17px 18px;background:linear-gradient(145deg,rgba(14,30,49,.9),rgba(7,17,30,.78));border:1px solid var(--line);border-radius:16px;box-shadow:0 15px 38px rgba(0,0,0,.12)}
+.metric-card:before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(180deg,#00a9df,rgba(0,169,223,0));opacity:.8}.metric-card:after{content:"";position:absolute;right:-25px;top:-30px;width:90px;height:90px;border-radius:50%;background:rgba(0,169,223,.08);filter:blur(8px)}
+.metric-label{font-size:9px;letter-spacing:.13em;color:#6f89a3;font-weight:850}.metric-value{display:block;margin-top:8px;font-size:24px;line-height:1;font-weight:900;letter-spacing:-.045em;color:#f1fbff;word-break:break-word}.metric-meta{display:block;margin-top:8px;color:#6d879f;font-size:9px}.metric-value.up{color:var(--green)!important}.metric-value.dn{color:var(--red)!important}
+.visual-grid{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(360px,.78fr);gap:14px;align-items:stretch;margin-bottom:14px}
+.panel{background:linear-gradient(145deg,rgba(14,27,46,.84),rgba(7,16,29,.78));border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 45px rgba(0,0,0,.14);overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 17px 10px;border-bottom:1px solid rgba(105,150,196,.08)}.panel-title{font-size:10px;color:#a1bad1;letter-spacing:.13em;text-transform:uppercase;font-weight:850}.panel-tag{font-size:9px;color:#5f7e9a;text-transform:uppercase;letter-spacing:.08em}
+#stage{position:relative;height:430px;width:100%;overflow:hidden;background:radial-gradient(circle at 50% 55%,rgba(0,142,210,.14),transparent 35%),radial-gradient(circle at 50% 100%,rgba(70,217,255,.05),transparent 48%)}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}#cv:active{cursor:grabbing}
+#stage:after{content:"";position:absolute;inset:auto 0 0;height:120px;pointer-events:none;background:linear-gradient(to top,rgba(5,9,20,.72),transparent)}
+#hud{position:absolute;left:18px;top:16px;right:18px;display:flex;flex-wrap:wrap;gap:7px;align-items:center;pointer-events:none;z-index:10}#hud>*{pointer-events:auto}
+#per{font-size:10px;font-weight:800;letter-spacing:.06em;color:#eaf7ff;background:rgba(7,17,31,.75);border:1px solid var(--line);padding:7px 10px;border-radius:999px;backdrop-filter:blur(12px)}
+.demo{background:rgba(255,184,0,.12);color:#ffd05c;padding:6px 9px;border:1px solid rgba(255,184,0,.28);border-radius:999px;font-size:9px;font-weight:800}
+#hint{position:absolute;bottom:15px;left:18px;color:#718ba5;font-size:9px;pointer-events:none;z-index:10;background:rgba(5,9,20,.48);padding:6px 9px;border:1px solid rgba(255,255,255,.05);border-radius:8px}
+#stage:before{content:"INTERACTIVE PERFORMANCE PODIUM";position:absolute;left:18px;bottom:17px;z-index:8;font-size:8px;letter-spacing:.16em;font-weight:850;color:#526f8b;pointer-events:none;transform:translateY(-1px)}
+.ranking-panel{height:430px;display:flex;flex-direction:column}.ranking-body{padding:7px 17px 12px;overflow:auto;flex:1}.ranking-body .sub{margin:9px 0 3px}.row{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(105,150,196,.09)}.row:last-child{border-bottom:0}.rk{font-weight:900;color:#42d2ff;font-size:12px}.nm{font-size:11px;font-weight:700;word-break:break-word}.nm small{color:#607a94;display:block;font-size:9px;font-weight:500;margin-top:2px}.v{text-align:right;font-weight:850;font-size:11px;white-space:nowrap}.v small{font-size:9px!important;color:#637d98!important;font-weight:500!important}
+.rank-footer{display:flex;gap:6px;padding:10px 17px 14px;border-top:1px solid rgba(105,150,196,.08)}.rank-footer .ghost{flex:1;padding:8px;font-size:9px}
+.lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.card{background:linear-gradient(145deg,rgba(14,27,46,.84),rgba(8,17,31,.76));border:1px solid var(--line);border-radius:16px;padding:17px;backdrop-filter:blur(18px);box-shadow:0 14px 42px rgba(0,0,0,.12)}.card h2{font-size:10px;color:#9fb9d2;margin-bottom:12px;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:7px;font-weight:850}.card:hover{border-color:rgba(105,150,196,.24)}
+#ai{min-height:108px;color:#cfe8fb;white-space:pre-wrap;font-size:12px;line-height:1.65}.ai-card{position:relative;overflow:hidden}.ai-card:after{content:"";position:absolute;right:-35px;bottom:-45px;width:150px;height:150px;border-radius:50%;background:rgba(0,169,223,.07);filter:blur(5px);pointer-events:none}#ai:after{content:"▌";color:var(--cyan);animation:bl 1s infinite}@keyframes bl{50%{opacity:0}}
+#breakdown{min-height:108px}.breakdown-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.breakdown-item{padding:10px 11px;border:1px solid rgba(105,150,196,.10);border-radius:11px;background:rgba(5,13,25,.5)}.breakdown-item small{display:block;color:#718ba5;font-size:8px;text-transform:uppercase;letter-spacing:.1em;font-weight:800}.breakdown-item b{display:block;margin-top:5px;font-size:13px}.up{color:var(--green)!important}.dn{color:var(--red)!important}
+.bottom-grid{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:14px}.chat-card{min-height:270px}.m{margin:6px 0;padding:9px 11px;border-radius:11px;background:rgba(18,40,67,.65);white-space:pre-wrap;font-size:11px;word-break:break-word;border:1px solid rgba(105,150,196,.08)}.m.u{background:linear-gradient(135deg,#0d6fd1,#078dbf);margin-left:26px;text-align:right;border:0}#cl{max-height:160px;overflow-y:auto;padding-right:3px}.quick-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.qc{padding:6px 8px;font-size:9px;border-radius:999px}#ci{min-width:0}#cs{padding:10px 12px;white-space:nowrap}
+.controls-card{padding:13px 15px}.controls-card .control-btn-group{display:flex;gap:6px;flex-wrap:wrap}.control-btn-group button{padding:8px 10px;font-size:9px}.control-btn-group button.on{background:rgba(0,130,195,.16);border-color:rgba(56,208,255,.32)}
+#upc{margin-bottom:14px}.upload-grid{display:grid;grid-template-columns:150px 1fr auto;gap:9px;align-items:end}#upc input[type=file]{padding:8px;font-size:11px}
+.empty{color:var(--muted);padding:18px;text-align:center;font-size:12px}.sub{font-size:9px;letter-spacing:.13em;color:#68839e;margin:9px 0 3px;text-transform:uppercase;font-weight:800}.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi{position:relative;background:rgba(5,13,25,.62);padding:13px;border-radius:13px;border:1px solid rgba(105,150,196,.10);overflow:hidden}.kpi small{color:#718ba5;display:block;font-size:9px;letter-spacing:.1em;font-weight:750}.kpi b{font-size:17px;display:block;margin-top:3px;letter-spacing:-.02em;word-break:break-all}
+@media (min-width:1200px){.dashboard-shell{padding-left:34px;padding-right:34px}.visual-grid{grid-template-columns:minmax(0,1.28fr) minmax(390px,.72fr)}}
+@media (max-width:1050px){.dashboard-shell{padding:22px 20px 32px}.overview-grid{grid-template-columns:repeat(2,1fr)}.visual-grid{grid-template-columns:1fr}.ranking-panel{height:auto;min-height:360px}.bottom-grid{grid-template-columns:1fr}.toolbar-title{align-items:center}.toolbar-actions{flex-wrap:wrap;justify-content:flex-end}}
 
-    .hide { display: none !important; }
+/* COMPARISON — SPORTS BENCHMARK ANALYTICS */
+.compare-card{margin-top:14px;background:linear-gradient(145deg,rgba(14,27,46,.90),rgba(7,16,29,.84));border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 45px rgba(0,0,0,.14);overflow:hidden}
+.compare-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 18px 15px;border-bottom:1px solid rgba(105,150,196,.09)}
+.compare-title{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:900;color:#dff6ff}
+.compare-sub{font-size:9px;color:#66839e;margin-top:5px;line-height:1.5}
+.period-pill{flex:0 0 auto;font-size:8px;color:#9fdfff;border:1px solid rgba(70,217,255,.24);background:rgba(22,136,255,.08);padding:6px 9px;border-radius:999px;letter-spacing:.08em;font-weight:850;white-space:nowrap}
+.compare-body{padding:16px}
+.compare-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.compare-stat{min-width:0;padding:14px;border:1px solid rgba(105,150,196,.12);border-radius:14px;background:rgba(5,14,26,.55);overflow:hidden}
+.compare-stat .small{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#6f89a3;font-weight:850}
+.compare-stat .big{font-size:21px;font-weight:900;letter-spacing:-.04em;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.compare-stat .mini{font-size:9px;color:#66819b;margin-top:4px;line-height:1.45}
+.compare-stat .good{color:var(--green)}.compare-stat .bad{color:var(--red)}
+.compare-grid{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(300px,.82fr);gap:12px;margin-bottom:12px}
+.compare-panel{border:1px solid rgba(105,150,196,.10);border-radius:14px;background:rgba(5,14,26,.42);overflow:hidden}
+.compare-panel-head{padding:13px 14px 10px;border-bottom:1px solid rgba(105,150,196,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.compare-panel-title{font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:#b9d2e8;font-weight:900}
+.compare-panel-sub{font-size:8px;color:#607b95;margin-top:3px;line-height:1.45}
+.compare-legend{font-size:8px;color:#607b95;white-space:nowrap}
+.gap-chart{padding:13px 14px 14px}
+.gap-row{display:grid;grid-template-columns:minmax(105px,1.05fr) minmax(140px,2fr) 66px;gap:9px;align-items:center;padding:7px 0}
+.gap-name{min-width:0;font-size:9px;font-weight:750;color:#dcecf8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gap-name small{display:block;font-size:7px;color:#536f89;font-weight:500;margin-top:2px;overflow:hidden;text-overflow:ellipsis}
+.gap-track{height:11px;border-radius:999px;background:rgba(103,137,166,.10);position:relative;overflow:hidden}
+.gap-track:after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(205,232,250,.22)}
+.gap-bar{position:absolute;top:2px;height:7px;border-radius:999px;min-width:2px}
+.gap-bar.pos{left:50%;background:linear-gradient(90deg,#2ed69b,#46d9ff);box-shadow:0 0 12px rgba(46,214,155,.18)}
+.gap-bar.neg{right:50%;background:linear-gradient(90deg,#ff5578,#ff9d66);box-shadow:0 0 12px rgba(255,85,120,.16)}
+.gap-value{text-align:right;font-size:9px;font-weight:900;white-space:nowrap}
+.gap-value.pos{color:var(--green)}.gap-value.neg{color:var(--red)}.gap-value.zero{color:#9ab1c8}
+.gap-scale{display:flex;justify-content:space-between;color:#4e6b85;font-size:7px;margin:3px 66px 0 0;padding-left:calc(105px + 9px)}
+.compare-list{padding:6px 14px 10px}
+.compare-item{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(105,150,196,.07)}
+.compare-item:last-child{border-bottom:0}
+.compare-rank{font-size:8px;font-weight:900;color:#58d8ff;text-align:center}
+.compare-item-name{font-size:9px;font-weight:800;color:#dcecf8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.compare-item-meta{display:block;font-size:7px;color:#55718b;margin-top:2px}
+.compare-item-gap{font-size:9px;font-weight:900;white-space:nowrap}
+.compare-item-gap.pos{color:var(--green)}.compare-item-gap.neg{color:var(--red)}
+.compare-table-wrap{overflow:auto;border:1px solid rgba(105,150,196,.10);border-radius:14px;margin-top:12px}
+.compare-table{width:100%;border-collapse:collapse;min-width:720px}
+.compare-table th,.compare-table td{padding:10px 11px;border-bottom:1px solid rgba(105,150,196,.07);text-align:right;font-size:9px;white-space:nowrap}
+.compare-table th{font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:#6e89a3;background:rgba(10,22,38,.7);position:sticky;top:0;z-index:1}
+.compare-table th:first-child,.compare-table td:first-child{text-align:left}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-name{font-weight:800;color:#eaf6ff}.compare-id{display:block;color:#55728e;font-size:7px;margin-top:2px;font-weight:500}
+.gap-up{color:var(--green);font-weight:900}.gap-down{color:var(--red);font-weight:900}.gap-neutral{color:#9ab1c8;font-weight:800}
+.compare-note{margin-top:10px;font-size:8px;color:#58748e;line-height:1.55}
+.compare-upload{display:grid;grid-template-columns:1fr 1.7fr auto;gap:9px;align-items:end}
+.compare-upload input[type=file]{padding:8px;font-size:11px}
+.upload-status{font-size:10px;color:#7c97b0;margin-top:8px;line-height:1.5}
+@media (max-width:1100px){.compare-kpis{grid-template-columns:repeat(2,1fr)}.compare-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.compare-body{padding:12px}.compare-upload{grid-template-columns:1fr}.compare-head{padding:15px}.gap-row{grid-template-columns:minmax(90px,1fr) minmax(130px,2fr) 58px}.gap-scale{padding-left:calc(90px + 9px)}}
+@media (max-width:600px){.compare-kpis{grid-template-columns:1fr 1fr;gap:8px}.compare-stat{padding:11px}.compare-stat .big{font-size:17px}.compare-head{flex-direction:column;gap:9px}.period-pill{align-self:flex-start}.compare-body{padding:10px}.compare-panel-head{padding:11px 12px 9px}.gap-chart{padding:10px 12px 12px}.gap-row{grid-template-columns:minmax(72px,.9fr) minmax(95px,1.7fr) 54px;gap:6px;padding:6px 0}.gap-name{font-size:8px}.gap-name small{font-size:6.5px}.gap-value{font-size:8px}.gap-scale{padding-left:calc(72px + 6px);margin-right:54px}.compare-list{padding-left:12px;padding-right:12px}}
+@media (max-width:400px){.compare-kpis{grid-template-columns:1fr}.compare-stat .big{font-size:19px}.gap-row{grid-template-columns:78px minmax(70px,1fr) 49px}.gap-scale{padding-left:84px;margin-right:49px}}
+</style>
 
-    h1, h2 {
-      font-family: -apple-system, BlinkMacSystemFont, "Arial Black", Impact, sans-serif;
-      letter-spacing: .04em;
-      margin: 0;
-    }
-
-    .logo {
-      font-size: 20px;
-      font-weight: 900;
-      color: #fff;
-      display: flex;
-      align-items: center;
-    }
-    .logo b { color: var(--c); }
-    .logo i {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background: var(--p);
-      transform: skewX(-20deg);
-      margin-right: 8px;
-      box-shadow: 0 0 14px var(--c);
-    }
-
-    /* AUTH PAGE RESPONSIVE */
-    #auth {
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: grid;
-      place-items: center;
-      padding: clamp(16px, 4vw, 32px);
-      padding-top: max(20px, env(safe-area-inset-top));
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
-    }
-
-    .box {
-      width: min(400px, 100%);
-      background: var(--card);
-      border: 1px solid #1d4a7a;
-      border-radius: 16px;
-      padding: clamp(20px, 5vw, 32px);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 0 60px rgba(0, 130, 195, 0.25);
-    }
-
-    .box p { color: var(--m); margin: 6px 0 18px; font-size: 13px; }
-
-    label {
-      display: block;
-      font-size: 11px;
-      letter-spacing: .12em;
-      color: var(--m);
-      margin: 12px 0 4px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px 14px;
-      background: #06142b;
-      border: 1px solid #1d4a7a;
-      border-radius: 10px;
-      color: var(--t);
-      font: inherit;
-      font-size: 14px;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-
-    select {
-      background-image: url("data:image/svg+xml;utf8,<svg fill='%2338d0ff' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 36px;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--c);
-      box-shadow: 0 0 0 3px rgba(56, 208, 255, 0.25);
-    }
-
-    button {
-      cursor: pointer;
-      font: inherit;
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-weight: 700;
-      letter-spacing: .05em;
-      background: linear-gradient(90deg, var(--p), #00a6e8);
-      color: #fff;
-      transition: transform 0.1s ease, filter 0.2s ease, box-shadow 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: manipulation;
-    }
-
-    button:active { transform: scale(0.98); }
-    button:hover { filter: brightness(1.15); box-shadow: 0 0 18px rgba(56, 208, 255, 0.4); }
-
-    button.ghost {
-      background: transparent;
-      border: 1px solid #1d4a7a;
-      color: var(--m);
-    }
-    button.ghost.on {
-      background: var(--p);
-      color: #fff;
-      border-color: var(--c);
-      box-shadow: 0 0 12px rgba(56, 208, 255, 0.3);
-    }
-    button.danger {
-      background: rgba(255, 77, 109, 0.1);
-      border: 1px solid var(--r);
-      color: var(--r);
-      padding: 6px 12px;
-      font-size: 12px;
-    }
-    button.danger:hover { background: var(--r); color: #fff; }
-
-    .full { width: 100%; margin-top: 18px; }
-    .sw { margin-top: 16px; text-align: center; color: var(--m); cursor: pointer; font-size: 13px; }
-    .sw u { color: var(--c); }
-    #err { color: var(--r); font-size: 13px; margin-top: 10px; min-height: 16px; text-align: center; }
-
-    /* LAYOUT UTAMA DENGAN SAFE AREA SUPPORT */
-    #app {
-      display: grid;
-      grid-template-rows: auto 1fr;
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-    }
-
-    header {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-bottom: 1px solid #123a66;
-      background: rgba(4, 10, 22, 0.95);
-      backdrop-filter: blur(8px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .chip {
-      padding: 4px 10px;
-      border: 1px solid #1d4a7a;
-      border-radius: 20px;
-      color: var(--m);
-      font-size: 11px;
-      background: rgba(6, 20, 43, 0.6);
-      white-space: nowrap;
-      max-width: 180px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .chip b { color: var(--c); }
-
-    /* MAIN GRID & RESPONSIVE BREAKPOINTS */
-    main {
-      display: grid;
-      grid-template-columns: 1fr 390px;
-      min-height: 0;
-      width: 100%;
-    }
-
-    #stage {
-      position: relative;
-      min-height: 380px;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: radial-gradient(circle at 50% 50%, rgba(0, 130, 195, 0.1), transparent 70%);
-    }
-
-    #cv {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-      cursor: grab;
-    }
-    #cv:active { cursor: grabbing; }
-
-    #hud {
-      position: absolute;
-      left: 12px;
-      top: 12px;
-      right: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      pointer-events: none;
-      z-index: 10;
-    }
-    #hud > * { pointer-events: auto; }
-
-    #per {
-      font-family: -apple-system, BlinkMacSystemFont, "Arial Black", sans-serif;
-      font-size: 12px;
-      color: #fff;
-      background: var(--card);
-      padding: 4px 10px;
-      border-left: 3px solid var(--c);
-      border-radius: 0 6px 6px 0;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-
-    #hint {
-      position: absolute;
-      bottom: 8px;
-      left: 12px;
-      right: 12px;
-      color: var(--m);
-      font-size: 10px;
-      pointer-events: none;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-      background: rgba(4, 10, 22, 0.6);
-      padding: 3px 6px;
-      border-radius: 6px;
-      width: fit-content;
-    }
-
-    aside {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 16px;
-      border-left: 1px solid #123a66;
-      background: rgba(4, 10, 22, 0.85);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 20;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid #17436f;
-      border-radius: 14px;
-      padding: 14px;
-      backdrop-filter: blur(6px);
-    }
-
-    .card h2 {
-      font-size: 12px;
-      color: var(--c);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .kpis {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .kpi {
-      background: rgba(6, 20, 43, 0.6);
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #123a66;
-    }
-    .kpi small { color: var(--m); display: block; font-size: 10px; letter-spacing: 0.05em; }
-    .kpi b { font-size: 16px; word-break: break-all; }
-
-    .control-btn-group {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
-    .control-btn-group button {
-      flex: 1 1 auto;
-      padding: 8px 10px;
-      font-size: 12px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 24px 1fr auto;
-      gap: 8px;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #0f2c4f;
-    }
-    .row:last-child { border-bottom: 0; }
-
-    .rk { font-family: "Arial Black", sans-serif; color: var(--c); font-size: 13px; }
-    .nm { font-size: 12px; font-weight: 600; word-break: break-word; }
-    .nm small { color: var(--m); display: block; font-size: 10px; font-weight: normal; }
-    .v { text-align: right; font-weight: 700; font-size: 12px; white-space: nowrap; }
-    .up { color: var(--g); }
-    .dn { color: var(--r); }
-
-    #ai {
-      min-height: 80px;
-      color: #cfe8fb;
-      white-space: pre-wrap;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    #ai:after { content: "▌"; color: var(--c); animation: bl 1s infinite; }
-    @keyframes bl { 50% { opacity: 0; } }
-
-    .empty { color: var(--m); padding: 18px; text-align: center; font-size: 13px; }
-    .sub {
-      font-size: 10px;
-      letter-spacing: .14em;
-      color: var(--m);
-      margin: 8px 0 4px;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-
-    .m {
-      margin: 6px 0;
-      padding: 8px 12px;
-      border-radius: 10px;
-      background: #0b2447;
-      white-space: pre-wrap;
-      font-size: 12px;
-      word-break: break-word;
-    }
-    .m.u { background: var(--p); margin-left: 20px; text-align: right; }
-    #cl { max-height: 200px; overflow-y: auto; padding-right: 4px; }
-
-    .quick-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 8px;
-    }
-    .qc { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
-
-    .demo {
-      background: #ffb800;
-      color: #000;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    /* MOBILE & TABLET FIX: STICKY STAGE AGAR PODIUM DILAYAR TETA P TERLIHAT SAAT SCROLL */
-    @media (max-width: 900px) {
-      #app { height: auto; min-height: 100vh; min-height: 100dvh; }
-      main { display: flex; flex-direction: column; }
-      
-      #stage {
-        position: sticky;
-        top: 0;
-        height: 42vh;
-        min-height: 250px;
-        max-height: 380px;
-        z-index: 10;
-        border-bottom: 1px solid #123a66;
-        background: var(--bg);
-      }
-      
-      aside {
-        border-left: 0;
-        padding: 12px;
-        position: relative;
-        z-index: 20;
-      }
-    }
-
-    @media (max-width: 480px) {
-      header { padding: 8px 10px; }
-      .logo { font-size: 16px; }
-      .chip { max-width: 120px; font-size: 10px; }
-      #stage { height: 38vh; min-height: 230px; }
-      .kpis { grid-template-columns: 1fr; gap: 6px; }
-      button { padding: 8px 10px; font-size: 12px; }
-    }
-  </style>
 </head>
 <body>
 
@@ -474,68 +248,102 @@
   </header>
   
   <main>
-    <div id="stage">
-      <canvas id="cv"></canvas>
-      <div id="hud">
-        <span id="per"></span>
-        <span id="dm" class="demo hide">DEMO DATA</span>
+    <div class="dashboard-shell">
+      <div class="dashboard-toolbar">
+        <div class="toolbar-title">
+          <div><div class="eyebrow">SPORT PERFORMANCE ANALYTICS</div><div class="page-title">Performance Overview</div></div>
+          <span class="period-pill" id="top_period">LIVE DATA</span>
+        </div>
+        <div class="toolbar-actions">
+          <div class="period-control"><span class="eyebrow">PERIOD</span><select id="hist_sel"></select></div>
+          <div class="control-inline" id="ctl"></div>
+          <button class="danger" id="del_per">Delete</button>
+        </div>
       </div>
-      <div id="hint">Drag untuk memutar · Scroll / Pinch untuk zoom</div>
+
+      <div class="overview-grid" id="overview_metrics">
+        <div class="metric-card"><span class="metric-label">TOTAL GMV</span><span class="metric-value" id="metric_gmv">—</span><span class="metric-meta">Current performance</span></div>
+        <div class="metric-card"><span class="metric-label">GROWTH</span><span class="metric-value" id="metric_growth">—</span><span class="metric-meta">Compared to Last Year</span></div>
+        <div class="metric-card"><span class="metric-label">TOP PERFORMER</span><span class="metric-value" id="metric_top">—</span><span class="metric-meta" id="metric_top_meta">Highest GMV</span></div>
+        <div class="metric-card"><span class="metric-label">DECLINING ITEMS</span><span class="metric-value" id="metric_down">—</span><span class="metric-meta">Items below 0% growth</span></div>
+      </div>
+
+      <div class="panel controls-card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div><div class="panel-title">VIEW & METRIC</div><div class="panel-tag">Change the leaderboard focus</div></div>
+          <div class="control-btn-group" id="ctl_secondary"></div>
+        </div>
+      </div>
+
+      <div class="panel hide" id="upc">
+        <div class="panel-head"><span class="panel-title">UPDATE PERFORMANCE DATA</span><span class="panel-tag">CSV upload</span></div>
+        <div style="padding:15px">
+          <div class="upload-grid">
+            <div><label>Jenis data</label><select id="lv">
+              <option value="sports">Sports</option>
+              <option value="families">Families</option>
+              <option value="models">Models</option>
+            </select></div>
+            <div><label>Store CSV · child data</label><input type="file" id="fl" accept=".csv" style="padding:8px"></div>
+            <div><button id="upload_dummy" class="ghost" type="button" style="display:none">Upload</button></div>
+          </div>
+          <div id="us" style="margin-top:8px;color:var(--m);font-size:12px"></div>
+
+          <div style="height:1px;background:rgba(105,150,196,.08);margin:16px 0"></div>
+
+          <div class="panel-title">BENCHMARK / OTHER STORES · SPORTS ONLY</div>
+          <div class="panel-tag" style="margin-top:4px">Benchmark hanya tersedia untuk <b>Sports</b>. Sistem membaca kolom <b>parent.*</b> dan membandingkan Sports store kamu dengan benchmark toko lain.</div>
+          <div class="compare-upload" style="margin-top:12px">
+            <div><label>Target Sports period</label><select id="cmp_period"></select></div>
+            <div><label>Benchmark CSV · parent data</label><input type="file" id="cmp_file" accept=".csv"></div>
+            <button id="cmp_upload_btn" type="button">Import Sports Benchmark</button>
+          </div>
+          <div id="cmp_us" class="upload-status">Benchmark hanya dapat dipilih untuk periode Sports.</div>
+        </div>
+      </div>
+
+      <div class="visual-grid">
+        <section class="panel">
+          <div class="panel-head"><span class="panel-title">INTERACTIVE PERFORMANCE PODIUM</span><span class="panel-tag">Drag · Zoom</span></div>
+          <div id="stage">
+            <canvas id="cv"></canvas>
+            <div id="hud"><span id="per"></span><span id="dm" class="demo hide">DEMO DATA</span></div>
+            <div id="hint">Drag untuk memutar · Scroll / Pinch untuk zoom</div>
+          </div>
+        </section>
+
+        <section class="panel ranking-panel">
+          <div class="panel-head"><span class="panel-title" id="lt">TOP PERFORMANCE</span><span class="panel-tag">Live ranking</span></div>
+          <div class="ranking-body" id="ls"></div>
+          <div class="rank-footer"><button class="ghost" id="rank_gmv" type="button">GMV</button><button class="ghost" id="rank_growth" type="button">GROWTH</button></div>
+        </section>
+      </div>
+
+      <div class="lower-grid">
+        <section class="card ai-card"><h2>✦ AI PERFORMANCE COACH</h2><div id="ai"></div></section>
+        <section class="card"><h2>◈ PERFORMANCE BREAKDOWN</h2><div id="breakdown" class="breakdown-list"></div></section>
+      </div>
+
+      <div class="bottom-grid">
+        <section class="card chat-card">
+          <h2>💬 TANYA DECA COACH</h2>
+          <div id="cl"></div>
+          <div class="quick-chips"><button class="ghost qc">Top GMV?</button><button class="ghost qc">Growth tertinggi?</button><button class="ghost qc">Yang paling turun?</button><button class="ghost qc">Saran?</button></div>
+          <div style="display:flex;gap:6px;margin-top:8px"><input id="ci" placeholder="Tanya, mis. padel…"><button id="cs" style="white-space:nowrap">Kirim</button></div>
+        </section>
+        <section class="card"><h2>📅 PERIOD HISTORY</h2><div style="font-size:11px;color:#718ba5;line-height:1.6">Gunakan selector periode di atas untuk berpindah antar data performa. Upload CSV tersedia melalui tombol CSV di header.</div><div style="margin-top:14px;padding:12px;border:1px solid rgba(105,150,196,.10);border-radius:12px;background:rgba(5,13,25,.42)"><div class="metric-label">ACTIVE PERIOD</div><div id="history_summary" style="margin-top:5px;font-size:14px;font-weight:800">—</div></div></section>
+      </div>
+
+      <section class="compare-card">
+        <div class="compare-head">
+          <div><div class="compare-title">🏆 COMPARE WITH OTHER STORES</div><div class="compare-sub">Benchmark network vs performa store kamu untuk periode aktif</div></div>
+          <span class="period-pill" id="compare_period_badge">NO BENCHMARK</span>
+        </div>
+        <div class="compare-body" id="compare_body">
+          <div class="empty">Upload Benchmark CSV melalui tombol <b>⬆ CSV</b> untuk melihat perbandingan.</div>
+        </div>
+      </section>
     </div>
-    
-    <aside>
-      <div class="card">
-        <h2>📅 PILIH PERIODE HISTORY</h2>
-        <select id="hist_sel"></select>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px">
-          <span id="hist_cnt" style="font-size:11px; color:var(--m)"></span>
-          <button id="del_per" class="danger">Hapus Periode Ini</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="control-btn-group" id="ctl"></div>
-      </div>
-
-      <div class="card hide" id="upc">
-        <h2>UPDATE DATA (ADMIN)</h2>
-        <label>Jenis data</label>
-        <select id="lv">
-          <option value="families">Families</option>
-          <option value="models">Models</option>
-        </select>
-        <label>File CSV (periode otomatis dari nama file)</label>
-        <input type="file" id="fl" accept=".csv" style="padding: 8px;">
-        <div id="us" style="margin-top:8px; color:var(--m); font-size:12px"></div>
-      </div>
-
-      <div class="card" id="kp"></div>
-      
-      <div class="card">
-        <h2 id="lt"></h2>
-        <div id="ls"></div>
-      </div>
-
-      <div class="card">
-        <h2>🤖 AI COACH — KESIMPULAN</h2>
-        <div id="ai"></div>
-      </div>
-
-      <div class="card">
-        <h2>💬 TANYA DECA COACH</h2>
-        <div id="cl"></div>
-        <div class="quick-chips">
-          <button class="ghost qc">Top GMV?</button>
-          <button class="ghost qc">Growth tertinggi?</button>
-          <button class="ghost qc">Yang paling turun?</button>
-          <button class="ghost qc">Saran?</button>
-        </div>
-        <div style="display:flex; gap:6px; margin-top:8px">
-          <input id="ci" placeholder="Tanya, mis. padel…">
-          <button id="cs" style="white-space:nowrap">Kirim</button>
-        </div>
-      </div>
-    </aside>
   </main>
 </section>
 
@@ -548,7 +356,7 @@ const SUPABASE_URL = 'https://weklxyyrydmdbigulrdk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indla2x4eXlyeWRtZGJpZ3VscmRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMDQxNDAsImV4cCI6MjEwNjc4MDE0MH0.Ifrr8nts6ERVZyK89Z5J6TjdOy-YCeVClohW4fnKH8Y';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let me=null, mode='in', V={lv:'families', met:'gmv', dir:'top', activePeriodId:null}, periodsList=[], currentData=null;
+let me=null, mode='in', V={lv:'families', met:'gmv', dir:'top', activePeriodId:null}, periodsList=[], currentData=null, comparisonData=null;
 
 // ---------- AUTH (SUPABASE AUTH) ----------
 $('sw').onclick=()=>{
@@ -589,44 +397,82 @@ async function loadPeriodsHistory(){
   const { data, error } = await sb.from('periods').select('*').order('created_at', { ascending: false });
   if(error) console.error(error);
   periodsList = data || [];
-  
-  const sel=$('hist_sel');
+  const sel=$('hist_sel'), cmpSel=$('cmp_period');
   if(!periodsList.length){
     sel.innerHTML='<option value="">Belum ada history</option>';
+    cmpSel.innerHTML='<option value="">Belum ada Sports period</option>';
     $('hist_cnt').textContent='Total history: 0 periode';
-    V.activePeriodId = null;
-    render();
-    return;
+    V.activePeriodId = null; comparisonData=null;
+    updateBenchmarkUI();
+    render(); renderComparison(); return;
   }
 
   sel.innerHTML = periodsList.map(p => `<option value="${p.id}" ${p.id === V.activePeriodId ? 'selected':''}>${p.period_name} (${p.data_type})</option>`).join('');
+
+  const sportsPeriods = periodsList.filter(p => String(p.data_type).toLowerCase() === 'sports');
+  cmpSel.innerHTML = sportsPeriods.length
+    ? sportsPeriods.map(p => `<option value="${p.id}" ${p.id === V.activePeriodId ? 'selected':''}>${p.period_name} (Sports)</option>`).join('')
+    : '<option value="">Belum ada Sports period</option>';
+
   $('hist_cnt').textContent=`Total history: ${periodsList.length} periode`;
-  
-  if(!V.activePeriodId && periodsList.length){
-    V.activePeriodId = periodsList[0].id;
+  if(!V.activePeriodId || !periodsList.some(p=>p.id===V.activePeriodId)) V.activePeriodId = periodsList[0].id;
+  sel.value=V.activePeriodId;
+
+  const activePeriod = periodsList.find(p => p.id === V.activePeriodId);
+  if(activePeriod && String(activePeriod.data_type).toLowerCase() === 'sports'){
+    cmpSel.value=V.activePeriodId;
+  } else if(sportsPeriods.length){
+    cmpSel.value=sportsPeriods[0].id;
   }
-  fetchDashboardData();
+
+  updateBenchmarkUI();
+  await fetchDashboardData();
 }
 
-$('hist_sel').onchange=e=>{
+$('hist_sel').onchange=async e=>{
   V.activePeriodId = e.target.value;
-  fetchDashboardData();
+  $('cmp_period').value=V.activePeriodId;
+  await fetchDashboardData();
+};
+
+$('cmp_period').onchange=async e=>{
+  const id=e.target.value;
+  const selected = periodsList.find(p => p.id === id);
+  if(!selected || String(selected.data_type).toLowerCase() !== 'sports'){
+    $('cmp_us').textContent='❌ Benchmark hanya dapat digunakan untuk data Sports.';
+    updateBenchmarkUI();
+    return;
+  }
+  V.activePeriodId=id;
+  $('hist_sel').value=V.activePeriodId;
+  await fetchDashboardData();
 };
 
 async function fetchDashboardData(){
   if(!V.activePeriodId) return;
   const selectedPeriod = periodsList.find(p => p.id === V.activePeriodId);
-  if(selectedPeriod) V.lv = selectedPeriod.data_type;
+  if(!selectedPeriod) return;
+  V.lv = selectedPeriod.data_type;
+  if($('lv')) $('lv').value = V.lv;
+  updateBenchmarkUI();
 
-  const { data, error } = await sb.from('performance_data').select('*').eq('period_id', V.activePeriodId);
+  const [{data,error},{data:cmp,error:cmpErr}] = await Promise.all([
+    sb.from('performance_data').select('*').eq('period_id', V.activePeriodId),
+    sb.from('comparison_data').select('*').eq('period_id', V.activePeriodId)
+  ]);
   if(error) return console.error(error);
+  if(cmpErr) console.warn('Comparison data belum tersedia:', cmpErr.message);
 
   currentData = {
     period: selectedPeriod.period_name,
-    total: { gmv: Number(selectedPeriod.total_gmv), rate: Number(selectedPeriod.total_rate) },
-    rows: data.map(d => ({ id: d.item_id, name: d.name, gmv: Number(d.gmv), rate: Number(d.rate) }))
+    total: { gmv: Number(selectedPeriod.total_gmv||0), rate: Number(selectedPeriod.total_rate||0) },
+    rows: (data||[]).map(d => ({ id: d.item_id, name: d.name, gmv: Number(d.gmv), rate: Number(d.rate) }))
   };
-  render();
+  comparisonData = {
+    total: { gmv: Number(selectedPeriod.benchmark_total_gmv||0), rate: Number(selectedPeriod.benchmark_total_rate||0) },
+    rows: (cmp||[]).map(d => ({ id: d.item_id, name: d.name, gmv: Number(d.benchmark_gmv), rate: Number(d.benchmark_rate) }))
+  };
+  render(); renderComparison();
 }
 
 $('del_per').onclick=async()=>{
@@ -662,11 +508,11 @@ const fd=s=>{ const d=s.split('-'); return +d[2]+' '+MO[+d[1]-1]+' '+d[0]; };
 
 $('fl').onchange=async e=>{
   const f=e.target.files[0]; if(!f) return;
-  $('us').textContent='⏳ Mengunggah data ke Supabase...';
+  const selectedType = $('lv').value;
+  $('us').textContent='⏳ Membaca Store CSV dan menyimpan ke Supabase...';
   const R=parse(await f.text()), H=R[0], ix=n=>H.indexOf(n);
   const need=['key','label','idHuman','child.gmv.omni','child.gmv.omniRate'];
-  if(need.some(n=>ix(n)<0)) return $('us').textContent='❌ Format CSV tidak dikenali.';
-  
+  if(need.some(n=>ix(n)<0)) return $('us').textContent='❌ Format Store CSV tidak dikenali.';
   const m=f.name.match(/(\d{4}-\d{2}-\d{2}).*?(\d{4}-\d{2}-\d{2})/);
   const per=m?fd(m[1])+' – '+fd(m[2]):f.name;
 
@@ -680,27 +526,82 @@ $('fl').onchange=async e=>{
   const { data: pData, error: pErr } = await sb.from('periods').insert([{
     user_id: me.id, period_name: per, data_type: $('lv').value, total_gmv: total.gmv, total_rate: total.rate
   }]).select().single();
-
   if(pErr) return $('us').textContent='❌ Gagal simpan periode: '+pErr.message;
 
   const rowsToInsert = rows.map(r => ({
     period_id: pData.id, item_id: String(r.id), name: r.name, gmv: r.gmv, rate: r.rate
   }));
-  
   const { error: dErr } = await sb.from('performance_data').insert(rowsToInsert);
-  if(dErr) return $('us').textContent='❌ Gagal simpan detail: '+dErr.message;
+  if(dErr){
+    await sb.from('periods').delete().eq('id',pData.id);
+    return $('us').textContent='❌ Gagal simpan detail: '+dErr.message;
+  }
 
-  $('us').textContent='✅ '+rows.length+' baris tersimpan ke database!';
+  $('us').textContent='✅ '+rows.length+' baris Store tersimpan sebagai '+selectedType+'.';
   V.activePeriodId = pData.id;
-  loadPeriodsHistory();
+  await loadPeriodsHistory();
+  if(selectedType === 'sports'){
+    $('cmp_period').value=pData.id;
+    $('cmp_us').textContent='✅ Periode Sports aktif dan siap menerima Benchmark CSV toko lain.';
+  } else {
+    $('cmp_us').textContent='ℹ️ Benchmark tidak tersedia untuk '+selectedType+'. Pilih/upload data Sports untuk menggunakan benchmark.';
+  }
+};
+
+$('cmp_upload_btn').onclick=async()=>{
+  const f=$('cmp_file').files[0], periodId=$('cmp_period').value;
+  if(!f) return $('cmp_us').textContent='❌ Pilih Benchmark CSV dulu.';
+  if(!periodId) return $('cmp_us').textContent='❌ Belum ada periode Sports. Upload Store CSV dengan Jenis data = Sports terlebih dahulu.';
+
+  const targetPeriod = periodsList.find(p => p.id === periodId);
+  if(!targetPeriod || String(targetPeriod.data_type).toLowerCase() !== 'sports'){
+    return $('cmp_us').textContent='❌ Benchmark hanya boleh diimpor untuk data Sports. Families/Models tidak dapat dibandingkan dengan benchmark.';
+  }
+
+  $('cmp_us').textContent='⏳ Membaca parent.* dari Benchmark Sports CSV...';
+  const R=parse(await f.text()), H=R[0], ix=n=>H.indexOf(n);
+  const need=['key','label','idHuman','parent.gmv.omni','parent.gmv.omniRate'];
+  if(need.some(n=>ix(n)<0)) return $('cmp_us').textContent='❌ CSV benchmark harus memiliki kolom parent.gmv.omni dan parent.gmv.omniRate.';
+
+  let total={gmv:0,rate:0}; const rows=[];
+  R.slice(1).forEach(r=>{
+    const o={id:r[ix('idHuman')],name:r[ix('label')],gmv:+r[ix('parent.gmv.omni')],rate:+r[ix('parent.gmv.omniRate')]};
+    if(r[ix('key')]=='totalKey') total={gmv:o.gmv,rate:o.rate};
+    else if(!isNaN(o.gmv)) rows.push(o);
+  });
+
+  const {error: pErr}=await sb.from('periods').update({
+    benchmark_total_gmv: total.gmv,
+    benchmark_total_rate: total.rate,
+    benchmark_source: f.name
+  }).eq('id',periodId);
+  if(pErr) return $('cmp_us').textContent='❌ Gagal menyimpan total benchmark: '+pErr.message;
+
+  const {error: delErr}=await sb.from('comparison_data').delete().eq('period_id',periodId);
+  if(delErr) return $('cmp_us').textContent='❌ Gagal menyiapkan benchmark lama: '+delErr.message;
+
+  const rowsToInsert=rows.map(r=>({period_id:periodId,item_id:String(r.id),name:r.name,benchmark_gmv:r.gmv,benchmark_rate:r.rate,source_file:f.name}));
+  if(rowsToInsert.length){
+    const {error:dErr}=await sb.from('comparison_data').insert(rowsToInsert);
+    if(dErr) return $('cmp_us').textContent='❌ Gagal simpan benchmark: '+dErr.message;
+  }
+
+  V.activePeriodId=periodId;
+  $('hist_sel').value=periodId;
+  $('cmp_period').value=periodId;
+  $('cmp_us').textContent='✅ Benchmark tersimpan: '+rows.length+' baris dari '+f.name;
+  await loadPeriodsHistory();
 };
 
 // ---------- UI RENDER ----------
 function ctl(){
   const g=(k,a)=>a.map(([v,l])=>`<button class="ghost ${V[k]==v?'on':''}" data-k="${k}" data-v="${v}">${l}</button>`).join('');
-  $('ctl').innerHTML=g('lv',[['families','FAMILIES'],['models','MODELS']])+g('met',[['gmv','GMV'],['rate','GROWTH %']])+g('dir',[['top','🏆 TOP'],['flop','⚠ FLOP']]);
-  $('ctl').querySelectorAll('button').forEach(b=>b.onclick=()=>{V[b.dataset.k]=b.dataset.v;render()});
+  const html=g('lv',[['sports','SPORTS'],['families','FAMILIES'],['models','MODELS']])+g('met',[['gmv','GMV'],['rate','GROWTH %']])+g('dir',[['top','🏆 TOP'],['flop','⚠ FLOP']]);
+  $('ctl').innerHTML=html; $('ctl_secondary').innerHTML=html;
+  document.querySelectorAll('#ctl button,#ctl_secondary button').forEach(b=>b.onclick=()=>{V[b.dataset.k]=b.dataset.v;render()});
 }
+
+$('rank_gmv').onclick=()=>{V.met='gmv';render()}; $('rank_growth').onclick=()=>{V.met='rate';render()};
 
 const rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
 const pc=n=>(n>0?'+':'')+n.toFixed(1).replace('.',',')+'%';
@@ -735,18 +636,214 @@ function render(){
   $('lt').textContent=(V.dir=='top'?'TOP 5 — ':'FLOP 5 — ')+V.lv.toUpperCase();
   if(!D || !D.rows || !D.rows.length){
     $('per').textContent='Belum ada data di database';
-    $('kp').innerHTML='';$('ls').innerHTML='<div class="empty">Belum ada data untuk periode ini. Upload CSV untuk menambah.</div>';
+    $('metric_gmv').textContent='—';$('metric_growth').textContent='—';$('metric_top').textContent='—';$('metric_down').textContent='—';$('ls').innerHTML='<div class="empty">Belum ada data untuk periode ini. Upload CSV untuk menambah.</div>';$('breakdown').innerHTML='<div class="empty">No performance data</div>';$('history_summary').textContent=D?.period||'—';
     type('Menunggu data...');
     podium([],[]);
+    renderComparison();
     return;
   }
   $('per').textContent=D.period;
-  $('kp').innerHTML=D.total?`<div class="kpis"><div class="kpi"><small>TOTAL GMV</small><b>${rp(D.total.gmv)}</b></div><div class="kpi"><small>GROWTH</small><b class="${D.total.rate>=0?'up':'dn'}">${pc(D.total.rate)}</b></div></div>`:'';
   const G=rk(D,'gmv'), R=rk(D,'rate');
-  $('ls').innerHTML='<div class="sub">GMV</div>'+lst(G,'gmv')+'<div class="sub" style="margin-top:12px">GROWTH RATE</div>'+lst(R,'rate');
+  const down=D.rows.filter(x=>x.rate<0).length;
+  $('metric_gmv').textContent=D.total?rp(D.total.gmv):'—';
+  $('metric_growth').textContent=D.total?pc(D.total.rate):'—'; $('metric_growth').className='metric-value '+(D.total&&D.total.rate>=0?'up':'dn');
+  $('metric_top').textContent=G[0]?.name||'—'; $('metric_top_meta').textContent=G[0]?rp(G[0].gmv)+' GMV':'Highest GMV';
+  $('metric_down').textContent=down+' / '+D.rows.length; $('metric_down').className='metric-value '+(down?'dn':'up');
+  $('top_period').textContent=D.period||'LIVE DATA'; $('history_summary').textContent=D.period||'—';
+  $('ls').innerHTML='<div class="sub">'+(V.dir=='top'?'TOP 5':'FLOP 5')+' · '+V.lv.toUpperCase()+'</div>'+lst(V.met=='gmv'?G:R,V.met);
+  $('breakdown').innerHTML=`<div class="breakdown-item"><small>Top GMV</small><b>${G[0]?.name||'—'}</b></div><div class="breakdown-item"><small>Growth leader</small><b class="up">${R[0]?.name||'—'}</b></div><div class="breakdown-item"><small>Lowest GMV</small><b>${G[G.length-1]?.name||'—'}</b></div><div class="breakdown-item"><small>Lowest growth</small><b class="${R[R.length-1]?.rate<0?'dn':''}">${R[R.length-1]?.name||'—'}</b></div>`;
   type(insight(D,V.lv));
   podium(G.slice(0,3),R.slice(0,3));
+  renderComparison();
 }
+
+function renderComparison(){
+  const el=$('compare_body'), badge=$('compare_period_badge');
+  const D=currentData, C=comparisonData;
+
+  if(D && String(V.lv).toLowerCase() !== 'sports'){
+    badge.textContent='SPORTS ONLY';
+    el.innerHTML='<div class="empty">Benchmark toko lain hanya tersedia untuk <b>Sports</b>. Families dan Models tetap dapat dianalisis tanpa benchmark.</div>';
+    return;
+  }
+
+  if(!D||!D.rows||!D.rows.length){
+    badge.textContent='NO STORE DATA';
+    el.innerHTML='<div class="empty">Belum ada Store data untuk dibandingkan.</div>';
+    return;
+  }
+
+  const validC=C&&C.rows&&C.rows.length;
+  const cTotal=C?.total||{gmv:0,rate:0};
+  const hasTotal=cTotal.gmv>0 || cTotal.rate!==0;
+  if(!validC && !hasTotal){
+    badge.textContent='UPLOAD BENCHMARK';
+    el.innerHTML='<div class="empty">Belum ada benchmark untuk periode ini.<br><span style="font-size:10px;color:#607b98">Upload Benchmark CSV untuk melihat gap, Top Outperformance, Top Underperformance, dan chart.</span></div>';
+    return;
+  }
+
+  badge.textContent='BENCHMARK READY';
+
+  const your=D.total||{gmv:0,rate:0};
+  const gmvGap=your.gmv-cTotal.gmv;
+  const rateGap=your.rate-cTotal.rate;
+  const gmvGapPct=cTotal.gmv ? (gmvGap/cTotal.gmv)*100 : 0;
+
+  const map=new Map((C?.rows||[]).map(x=>[String(x.id),x]));
+  const rows=D.rows.map(x=>{
+    const b=map.get(String(x.id));
+    return b ? {
+      ...x,
+      bgmv:b.gmv,
+      brate:b.rate,
+      gap:x.rate-b.rate,
+      gmvGapPct:b.gmv ? ((x.gmv-b.gmv)/b.gmv)*100 : 0
+    } : null;
+  }).filter(Boolean);
+
+  const out=rows.filter(x=>x.gap>0).sort((a,b)=>b.gap-a.gap);
+  const under=rows.filter(x=>x.gap<0).sort((a,b)=>a.gap-b.gap);
+  const chartRows=[...out.slice(0,5),...under.slice(0,5)];
+  const matched=rows.length;
+  const coverage=D.rows.length ? (matched/D.rows.length)*100 : 0;
+
+  const fmtGap=n=>(n>0?'+':'')+n.toFixed(1).replace('.',',')+' pp';
+  const pctOnly=n=>(n>0?'+':'')+n.toFixed(1).replace('.',',')+'%';
+
+  const makeList=(items, emptyText, cls)=>{
+    if(!items.length) return `<div class="empty" style="padding:14px">${emptyText}</div>`;
+    return `<div class="compare-list">${items.slice(0,5).map((x,i)=>`
+      <div class="compare-item">
+        <span class="compare-rank">${i+1}</span>
+        <span><span class="compare-item-name">${esc(x.name)}</span><span class="compare-item-meta">Store ${pc(x.rate)} · Benchmark ${pc(x.brate)}</span></span>
+        <span class="compare-item-gap ${cls}">${fmtGap(x.gap)}</span>
+      </div>`).join('')}</div>`;
+  };
+
+  const chart = chartRows.length ? chartRows.map(x=>{
+    const maxAbs=Math.max(1,...chartRows.map(y=>Math.abs(y.gap)));
+    const width=Math.max(3,Math.min(50,Math.abs(x.gap)/maxAbs*50));
+    const cls=x.gap>=0?'pos':'neg';
+    return `<div class="gap-row">
+      <div class="gap-name" title="${esc(x.name)}">${esc(x.name)}<small>${esc(x.id)}</small></div>
+      <div class="gap-track"><span class="gap-bar ${cls}" style="width:${width}%"></span></div>
+      <div class="gap-value ${cls}">${fmtGap(x.gap)}</div>
+    </div>`;
+  }).join('') : '<div class="empty">Tidak ada item yang match untuk chart.</div>';
+
+  const table=rows
+    .slice()
+    .sort((a,b)=>b.gap-a.gap)
+    .map(x=>`<tr>
+      <td><span class="compare-name">${esc(x.name)}</span><span class="compare-id">${esc(x.id)}</span></td>
+      <td>${rp(x.gmv)}</td><td>${pc(x.rate)}</td>
+      <td>${rp(x.bgmv)}</td><td>${pc(x.brate)}</td>
+      <td class="${x.gap>0?'gap-up':x.gap<0?'gap-down':'gap-neutral'}">${fmtGap(x.gap)}</td>
+      <td class="${x.gmvGapPct>0?'gap-up':x.gmvGapPct<0?'gap-down':'gap-neutral'}">${pctOnly(x.gmvGapPct)}</td>
+    </tr>`).join('');
+
+  const status = rateGap>0
+    ? `Store berada <b>${fmtGap(rateGap)}</b> di atas benchmark pada growth total.`
+    : rateGap<0
+      ? `Store berada <b>${fmtGap(rateGap)}</b> di bawah benchmark pada growth total.`
+      : 'Growth total Store berada setara dengan benchmark.';
+
+  el.innerHTML=`
+    <div class="compare-kpis">
+      <div class="compare-stat">
+        <div class="small">Store GMV</div><div class="big">${rp(your.gmv)}</div>
+        <div class="mini">Growth ${pc(your.rate)}</div>
+      </div>
+      <div class="compare-stat">
+        <div class="small">Benchmark GMV</div><div class="big">${rp(cTotal.gmv)}</div>
+        <div class="mini">Growth ${pc(cTotal.rate)}</div>
+      </div>
+      <div class="compare-stat">
+        <div class="small">Growth Gap</div><div class="big ${rateGap>0?'good':rateGap<0?'bad':''}">${fmtGap(rateGap)}</div>
+        <div class="mini">Store − benchmark</div>
+      </div>
+      <div class="compare-stat">
+        <div class="small">Benchmark Coverage</div><div class="big">${coverage.toFixed(0)}%</div>
+        <div class="mini">${matched} dari ${D.rows.length} item match</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-panel">
+        <div class="compare-panel-head">
+          <div><div class="compare-panel-title">📊 Performance Gap Chart</div><div class="compare-panel-sub">Growth Store dibanding growth benchmark · positif = outperform</div></div>
+          <div class="compare-legend">pp = percentage points</div>
+        </div>
+        <div class="gap-chart">
+          ${chart}
+          <div class="gap-scale"><span>Underperform</span><span>0</span><span>Outperform</span></div>
+        </div>
+      </div>
+
+      <div class="compare-panel">
+        <div class="compare-panel-head">
+          <div><div class="compare-panel-title">🚀 Top Outperformance</div><div class="compare-panel-sub">Gap growth terbesar vs benchmark</div></div>
+        </div>
+        ${makeList(out,'Belum ada item yang outperform.','pos')}
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-panel">
+        <div class="compare-panel-head">
+          <div><div class="compare-panel-title">⚠ Top Underperformance</div><div class="compare-panel-sub">Gap growth paling negatif vs benchmark</div></div>
+        </div>
+        ${makeList(under,'Tidak ada item yang underperform.','neg')}
+      </div>
+
+      <div class="compare-panel">
+        <div class="compare-panel-head">
+          <div><div class="compare-panel-title">🎯 Benchmark Readout</div><div class="compare-panel-sub">Ringkasan cepat untuk keputusan store</div></div>
+        </div>
+        <div class="compare-list">
+          <div class="compare-item"><span class="compare-rank">01</span><span><span class="compare-item-name">Total GMV gap</span><span class="compare-item-meta">Store − benchmark</span></span><span class="compare-item-gap ${gmvGap>=0?'pos':'neg'}">${rp(gmvGap)}</span></div>
+          <div class="compare-item"><span class="compare-rank">02</span><span><span class="compare-item-name">Total GMV index</span><span class="compare-item-meta">Relative to benchmark</span></span><span class="compare-item-gap ${gmvGapPct>=0?'pos':'neg'}">${pctOnly(gmvGapPct)}</span></div>
+          <div class="compare-item"><span class="compare-rank">03</span><span><span class="compare-item-name">Matched items</span><span class="compare-item-meta">Coverage of Store rows</span></span><span class="compare-item-gap">${matched}/${D.rows.length}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead><tr><th>Sports</th><th>Store GMV</th><th>Store Growth</th><th>Benchmark GMV</th><th>Benchmark Growth</th><th>Growth Gap</th><th>GMV Gap</th></tr></thead>
+        <tbody>${table||'<tr><td colspan="7" style="text-align:center;color:#607b98">Tidak ada item yang cocok berdasarkan id.</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="compare-note">💡 ${status} Top Outperformance dan Top Underperformance dihitung dari <b>growth gap</b> per Sports item. GMV Gap menunjukkan selisih GMV Store terhadap benchmark. Chart otomatis menyesuaikan lebar layar, dan tabel tetap bisa di-scroll horizontal di perangkat kecil.</div>`;
+}
+
+function updateBenchmarkUI(){
+  const lv = String($('lv')?.value || V.lv || '').toLowerCase();
+  const sportsActive = lv === 'sports';
+  const cmpSel = $('cmp_period'), cmpFile = $('cmp_file'), cmpBtn = $('cmp_upload_btn');
+
+  if(cmpSel){
+    cmpSel.disabled = !sportsActive;
+    const sportsPeriods = periodsList.filter(p => String(p.data_type).toLowerCase() === 'sports');
+    if(!sportsPeriods.length){
+      cmpSel.innerHTML='<option value="">Belum ada Sports period</option>';
+    } else if(!sportsActive){
+      cmpSel.innerHTML=sportsPeriods.map(p => `<option value="${p.id}">${p.period_name} (Sports)</option>`).join('');
+    }
+  }
+  if(cmpFile) cmpFile.disabled = !sportsActive;
+  if(cmpBtn) cmpBtn.disabled = !sportsActive;
+  if($('cmp_us') && !sportsActive){
+    $('cmp_us').textContent='ℹ️ Benchmark hanya tersedia untuk data Sports. Pilih Jenis data = Sports untuk mengaktifkan.';
+  }
+}
+
+$('lv').onchange=()=>{
+  V.lv=$('lv').value;
+  updateBenchmarkUI();
+};
+
+function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
 
 // ---------- 3D RENDERER DENGAN AUTO-FIT IPHONE 16 & MULTI-TOUCH ----------
 let sc, cam, ren, grp, bars=[], ex=[], rings=[], cf, cfT=0, rotY=.2, rotX=.1, zf=1, drag=0, lx=0, ly=0, introT=0, flopM=0, bt;
@@ -1057,9 +1154,13 @@ function startSession(session){
   const meta = me.user_metadata || {};
   $('auth').classList.add('hide');
   $('app').classList.remove('hide');$('me').innerHTML = `👤 <b>${me.email}</b> · ${meta.store || 'Store'} · ${meta.conso || 'Conso'}`;
-  $('up').onclick=()=>$('upc').classList.toggle('hide');
+  $('up').onclick=()=>{
+    $('upc').classList.toggle('hide');
+    updateBenchmarkUI();
+  };
   
   if(!ren) init();
+  updateBenchmarkUI();
   loadPeriodsHistory();
 }
 
