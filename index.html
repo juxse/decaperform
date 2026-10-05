@@ -1,0 +1,367 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>DecaPerform</title>
+<!-- SUPABASE SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#040a16;--p:#0082c3;--c:#38d0ff;--t:#e8f4ff;--m:#8fb3d1;--card:rgba(9,22,45,.78);--r:#ff4d6d;--g:#3dffa8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 "Segoe UI",system-ui,Arial,sans-serif;min-height:100vh;background-image:radial-gradient(circle at 20% 0,#0a2a55 0,transparent 55%),radial-gradient(circle at 90% 100%,#06335f 0,transparent 50%)}
+.hide{display:none!important}
+h1,h2{font-family:"Arial Black",Impact,sans-serif;letter-spacing:.04em;margin:0}
+.logo{font-size:22px;color:#fff}.logo b{color:var(--c)}
+.logo i{display:inline-block;width:12px;height:12px;background:var(--p);transform:skewX(-20deg);margin-right:8px;box-shadow:0 0 14px var(--c)}
+#auth{min-height:100vh;display:grid;place-items:center;padding:20px}
+.box{width:min(400px,100%);background:var(--card);border:1px solid #1d4a7a;border-radius:14px;padding:28px;backdrop-filter:blur(10px);box-shadow:0 0 60px rgba(0,130,195,.25)}
+.box p{color:var(--m);margin:6px 0 18px}
+label{display:block;font-size:11px;letter-spacing:.12em;color:var(--m);margin:12px 0 4px;text-transform:uppercase}
+input,select{width:100%;padding:11px 12px;background:#06142b;border:1px solid #1d4a7a;border-radius:8px;color:var(--t);font:inherit}
+input:focus,select:focus{outline:none;border-color:var(--c);box-shadow:0 0 0 2px rgba(56,208,255,.25)}
+button{cursor:pointer;font:inherit;border:0;border-radius:8px;padding:11px 16px;font-weight:700;letter-spacing:.06em;background:linear-gradient(90deg,var(--p),#00a6e8);color:#fff;transition:.2s}
+button:hover{filter:brightness(1.2);box-shadow:0 0 18px rgba(56,208,255,.5)}
+button.ghost{background:transparent;border:1px solid #1d4a7a;color:var(--m)}
+button.ghost.on{background:var(--p);color:#fff;border-color:var(--c)}
+button.danger{background:transparent;border:1px solid var(--r);color:var(--r);padding:4px 8px;font-size:11px}
+button.danger:hover{background:var(--r);color:#fff}
+.full{width:100%;margin-top:18px}.sw{margin-top:14px;text-align:center;color:var(--m);cursor:pointer;font-size:13px}.sw u{color:var(--c)}
+#err{color:var(--r);font-size:13px;margin-top:10px;min-height:16px}
+#app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #123a66;background:rgba(4,10,22,.8)}
+.chip{padding:5px 12px;border:1px solid #1d4a7a;border-radius:20px;color:var(--m);font-size:12px}.chip b{color:var(--c)}
+main{display:grid;grid-template-columns:1fr 390px;min-height:0}
+#stage{position:relative;min-height:320px}
+#cv{position:absolute;inset:0;touch-action:none;cursor:grab}
+#hud{position:absolute;left:14px;top:12px;right:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;pointer-events:none}
+#hud>*{pointer-events:auto}
+#per{font-family:"Arial Black",sans-serif;font-size:15px;color:#fff;background:var(--card);padding:6px 12px;border-left:4px solid var(--c)}
+#hint{position:absolute;bottom:10px;left:14px;color:var(--m);font-size:12px}
+aside{overflow:auto;padding:14px;border-left:1px solid #123a66;background:rgba(4,10,22,.6)}
+.card{background:var(--card);border:1px solid #17436f;border-radius:12px;padding:14px;margin-bottom:12px}
+.card h2{font-size:13px;color:var(--c);margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi small{color:var(--m);display:block;font-size:11px}.kpi b{font-size:18px}
+.row{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #0f2c4f}
+.rk{font-family:"Arial Black";color:var(--c)}.nm{font-size:13px}.nm small{color:var(--m);display:block;font-size:11px}
+.v{text-align:right;font-weight:700;font-size:13px}.up{color:var(--g)}.dn{color:var(--r)}
+#ai{min-height:100px;color:#cfe8fb;white-space:pre-wrap}#ai:after{content:"▌";color:var(--c);animation:bl 1s infinite}@keyframes bl{50%{opacity:0}}
+.empty{color:var(--m);padding:18px;text-align:center}
+.sub{font-size:11px;letter-spacing:.14em;color:var(--m);margin:2px 0 2px}.m{margin:6px 0;padding:8px 10px;border-radius:8px;background:#0b2447;white-space:pre-wrap;font-size:13px}.m.u{background:var(--p);margin-left:34px}#cl{max-height:220px;overflow:auto}.qc{padding:5px 9px;font-size:11px;margin:6px 4px 0 0}.demo{background:#ffb800;color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800}
+@media(max-width:860px){#app{height:auto}main{grid-template-columns:1fr}#stage{height:62vh}aside{border-left:0}}
+</style></head><body>
+<section id="auth"><div class="box"><div class="logo"><i></i>Deca<b>Perform</b></div>
+<p id="at">Masuk untuk membuka dashboard performa penjualan.</p>
+<label>Email</label><input id="u" type="email" placeholder="user@decathlon.com" autocomplete="username">
+<label>Password</label><input id="pw" type="password" autocomplete="current-password">
+<div id="reg" class="hide"><label>Store</label><input id="st" placeholder="contoh: Decathlon Kemang"><label>Conso</label><input id="co" placeholder="contoh: Conso 4"></div>
+<div id="err"></div><button class="full" id="go">SIGN IN</button>
+<div class="sw" id="sw">Belum punya akun? <u>Create Account</u></div></div></section>
+
+<section id="app" class="hide"><header><div class="logo"><i></i>Deca<b>Perform</b></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="chip" id="me"></span><button class="ghost" id="up">⬆ Upload CSV</button><button class="ghost" id="lo">Logout</button></div></header>
+<main><div id="stage"><canvas id="cv"></canvas>
+<div id="hud"><span id="per"></span><span id="dm" class="demo hide">DEMO DATA</span></div>
+<div id="hint">Drag untuk memutar podium · scroll untuk zoom · ganti Top/Flop untuk melihat danger zone</div></div>
+<aside>
+<div class="card">
+ <h2>📅 PILIH PERIODE HISTORY</h2>
+ <select id="hist_sel"></select>
+ <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+  <span id="hist_cnt" style="font-size:11px;color:var(--m)"></span>
+  <button id="del_per" class="danger">Hapus Periode Ini</button>
+ </div>
+</div>
+
+<div class="card"><div style="display:flex;gap:6px;flex-wrap:wrap" id="ctl"></div></div>
+<div class="card hide" id="upc"><h2>UPDATE DATA (ADMIN)</h2>
+<label>Jenis data</label><select id="lv"><option value="families">Families</option><option value="models">Models</option></select>
+<label>File CSV (periode otomatis dari nama file)</label><input type="file" id="fl" accept=".csv">
+<div id="us" style="margin-top:8px;color:var(--m);font-size:12px"></div></div>
+<div class="card" id="kp"></div>
+<div class="card"><h2 id="lt"></h2><div id="ls"></div></div>
+<div class="card"><h2>🤖 AI COACH — KESIMPULAN</h2><div id="ai"></div></div>
+<div class="card"><h2>💬 TANYA DECA COACH</h2><div id="cl"></div><div><button class="ghost qc">Top GMV?</button><button class="ghost qc">Growth tertinggi?</button><button class="ghost qc">Yang paling turun?</button><button class="ghost qc">Saran?</button></div><div style="display:flex;gap:6px;margin-top:8px"><input id="ci" placeholder="Tanya, mis. padel…"><button id="cs">Kirim</button></div></div>
+</aside></main></section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+
+// ---------- INISIALISASI SUPABASE ----------
+const SUPABASE_URL = 'https://weklxyyrydmdbigulrdk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indla2x4eXlyeWRtZGJpZ3VscmRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMDQxNDAsImV4cCI6MjEwNjc4MDE0MH0.Ifrr8nts6ERVZyK89Z5J6TjdOy-YCeVClohW4fnKH8Y';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let me=null, mode='in', V={lv:'families', met:'gmv', dir:'top', activePeriodId:null}, periodsList=[], currentData=null;
+
+// ---------- AUTH (SUPABASE AUTH) ----------
+$('sw').onclick=()=>{mode=mode=='in'?'new':'in';$('reg').classList.toggle('hide',mode=='in');$('go').textContent=mode=='in'?'SIGN IN':'CREATE ACCOUNT';$('sw').innerHTML=mode=='in'?'Belum punya akun? <u>Create Account</u>':'Sudah punya akun? <u>Sign In</u>';$('err').textContent=''};
+
+$('go').onclick=async()=>{
+ const email=$('u').value.trim(), password=$('pw').value;
+ $('err').textContent='Processing...';
+ if(!email || password.length < 6) return $('err').textContent='Email wajib & password minimal 6 karakter.';
+
+ if(mode=='new'){
+  const store = $('st').value.trim(), conso =$('co').value.trim();
+  if(!store || !conso) return $('err').textContent='Isi Store dan Conso.';
+  
+  const { data, error } = await sb.auth.signUp({
+   email, password,
+   options: { data: { store, conso } }
+  });
+  if(error) return $('err').textContent=error.message;
+  $('err').textContent='Akun berhasil dibuat! Silakan Sign In.';
+  $('sw').click();
+ } else {
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if(error) return $('err').textContent='Email atau password salah.';
+  startSession(data.session);
+ }
+};
+
+$('lo').onclick=async()=>{ await sb.auth.signOut(); location.reload(); };
+
+// ---------- HISTORY & SUPABASE FETCHING ----------
+async function loadPeriodsHistory(){
+ const { data, error } = await sb.from('periods').select('*').order('created_at', { ascending: false });
+ if(error) console.error(error);
+ periodsList = data || [];
+ 
+ const sel=$('hist_sel');
+ if(!periodsList.length){
+  sel.innerHTML='<option value="">Belum ada history</option>';
+  $('hist_cnt').textContent='Total history: 0 periode';
+  V.activePeriodId = null;
+  render();
+  return;
+ }
+
+ sel.innerHTML = periodsList.map(p => `<option value="${p.id}" ${p.id === V.activePeriodId ? 'selected':''}>${p.period_name} (${p.data_type})</option>`).join('');
+ $('hist_cnt').textContent=`Total history: ${periodsList.length} periode`;
+ 
+ if(!V.activePeriodId && periodsList.length){
+  V.activePeriodId = periodsList[0].id;
+ }
+ fetchDashboardData();
+}
+
+$('hist_sel').onchange=e=>{
+ V.activePeriodId = e.target.value;
+ fetchDashboardData();
+};
+
+async function fetchDashboardData(){
+ if(!V.activePeriodId) return;
+ const selectedPeriod = periodsList.find(p => p.id === V.activePeriodId);
+ if(selectedPeriod) V.lv = selectedPeriod.data_type;
+
+ const { data, error } = await sb.from('performance_data').select('*').eq('period_id', V.activePeriodId);
+ if(error) return console.error(error);
+
+ currentData = {
+  period: selectedPeriod.period_name,
+  total: { gmv: Number(selectedPeriod.total_gmv), rate: Number(selectedPeriod.total_rate) },
+  rows: data.map(d => ({ id: d.item_id, name: d.name, gmv: Number(d.gmv), rate: Number(d.rate) }))
+ };
+ render();
+}
+
+$('del_per').onclick=async()=>{
+ if(!V.activePeriodId) return;
+ if(!confirm('Hapus periode terpilih dari Supabase?')) return;
+ const { error } = await sb.from('periods').delete().eq('id', V.activePeriodId);
+ if(error) return alert('Gagal menghapus: ' + error.message);
+ V.activePeriodId = null;
+ loadPeriodsHistory();
+};
+
+// ---------- CSV PARSER & UPLOAD KE SUPABASE ----------
+function parse(t){t=t.replace(/^\uFEFF/,'');const R=[];let r=[],c='',q=0;for(let i=0;i<t.length;i++){const h=t[i];if(q){if(h=='"'){if(t[i+1]=='"'){c+='"';i++}else q=0}else c+=h}else if(h=='"')q=1;else if(h==','){r.push(c);c=''}else if(h=='\n'||h=='\r'){if(h=='\r'&&t[i+1]=='\n')i++;r.push(c);R.push(r);r=[];c=''}else c+=h}if(c||r.length){r.push(c);R.push(r)}return R.filter(x=>x.length>3)}
+const MO=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const fd=s=>{const d=s.split('-');return +d[2]+' '+MO[+d[1]-1]+' '+d[0]};
+
+$('fl').onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ $('us').textContent='⏳ Mengunggah data ke Supabase...';
+ const R=parse(await f.text()),H=R[0],ix=n=>H.indexOf(n);
+ const need=['key','label','idHuman','child.gmv.omni','child.gmv.omniRate'];
+ if(need.some(n=>ix(n)<0))return $('us').textContent='❌ Format CSV tidak dikenali.';
+ 
+ const m=f.name.match(/(\d{4}-\d{2}-\d{2}).*?(\d{4}-\d{2}-\d{2})/);
+ const per=m?fd(m[1])+' – '+fd(m[2]):f.name;
+
+ let total={ gmv: 0, rate: 0 }; const rows=[];
+ R.slice(1).forEach(r=>{
+  const o={ id:r[ix('idHuman')], name:r[ix('label')], gmv:+r[ix('child.gmv.omni')], rate:+r[ix('child.gmv.omniRate')] };
+  if(r[ix('key')]=='totalKey') total={ gmv:o.gmv, rate:o.rate };
+  else if(!isNaN(o.gmv)) rows.push(o);
+ });
+
+ // 1. Simpan Periode ke Supabase
+ const { data: pData, error: pErr } = await sb.from('periods').insert([{
+  user_id: me.id, period_name: per, data_type: $('lv').value, total_gmv: total.gmv, total_rate: total.rate
+ }]).select().single();
+
+ if(pErr) return $('us').textContent='❌ Gagal simpan periode: '+pErr.message;
+
+ // 2. Simpan Detail Items ke Supabase
+ const rowsToInsert = rows.map(r => ({
+  period_id: pData.id, item_id: String(r.id), name: r.name, gmv: r.gmv, rate: r.rate
+ }));
+ 
+ const { error: dErr } = await sb.from('performance_data').insert(rowsToInsert);
+ if(dErr) return $('us').textContent='❌ Gagal simpan detail: '+dErr.message;
+
+ $('us').textContent='✅ '+rows.length+' baris tersimpan ke database!';
+ V.activePeriodId = pData.id;
+ loadPeriodsHistory();
+};
+
+// ---------- UI RENDER ----------
+function ctl(){
+ const g=(k,a)=>a.map(([v,l])=>`<button class="ghost ${V[k]==v?'on':''}" data-k="${k}" data-v="${v}">${l}</button>`).join('');
+ $('ctl').innerHTML=g('lv',[['families','FAMILIES'],['models','MODELS']])+g('met',[['gmv','GMV'],['rate','GROWTH %']])+g('dir',[['top','🏆 TOP'],['flop','⚠ FLOP']]);
+ $('ctl').querySelectorAll('button').forEach(b=>b.onclick=()=>{V[b.dataset.k]=b.dataset.v;render()});
+}
+const rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
+const pc=n=>(n>0?'+':'')+n.toFixed(1).replace('.',',')+'%';
+const fv=(v,m)=>m=="gmv"?rp(v):pc(v);
+const rk=(d,m)=>{const a=[...d.rows].sort((x,y)=>m=='gmv'?y.gmv-x.gmv:y.rate-x.rate);return V.dir=='top'?a:a.reverse()};
+let typer;
+function type(t){clearTimeout(typer);const el=$('ai');el.textContent='';let i=0;(function s(){el.textContent=t.slice(0,i+=3);if(i<t.length)typer=setTimeout(s,14)})()}
+function insight(d,lv){
+ const A=[...d.rows],G=[...A].sort((a,b)=>b.gmv-a.gmv),R=[...A].sort((a,b)=>b.rate-a.rate);
+ const sh=d.total?G[0].gmv/d.total.gmv*100:0,neg=A.filter(x=>x.rate<0).length,L=lv=='families'?'family':'model';
+ const big=R.filter(x=>x.rate>100&&x.gmv>=G[0].gmv*.1)[0];
+ let t=`📅 Periode ${d.period}.\n`;
+ if(d.total)t+=`Total GMV ${rp(d.total.gmv)} (${pc(d.total.rate)} vs periode pembanding).\n\n`;
+ t+=`🏆 ${G[0].name} memimpin GMV (${rp(G[0].gmv)}${d.total?', ±'+sh.toFixed(0)+'% dari total':''}).\n`;
+ t+=`🚀 Growth tertinggi: ${R[0].name} (${pc(R[0].rate)}). ${big?`${big.name} patut dijaga: growth tinggi dengan GMV sudah signifikan.`:'Cek apakah basis GMV-nya masih kecil.'}\n`;
+ t+=`⚠ Growth terendah: ${R[R.length-1].name} (${pc(R[R.length-1].rate)}). ${neg} dari ${A.length} ${L} turun dibanding periode pembanding.\n\n`;
+ t+=`💡 Saran: amankan stok & display ${L} top growth, evaluasi harga/promo/availability untuk ${L} yang turun, dan pantau ${G[G.length-1].name} (GMV terendah).`;
+ return t;
+}
+const lst=(L,m)=>L.slice(0,5).map((o,i)=>`<div class="row"><span class="rk">${i+1}</span><span class="nm">${o.name}<small>${o.id}</small></span><span class="v ${m=='rate'?(o.rate>=0?'up':'dn'):''}">${fv(m=='gmv'?o.gmv:o.rate,m)}<small style="display:block;color:var(--m);font-weight:400">${m=='gmv'?pc(o.rate):rp(o.gmv)}</small></span></div>`).join('');
+
+function render(){
+ ctl();
+ const D = currentData;
+ $('lt').textContent=(V.dir=='top'?'TOP 5 — ':'FLOP 5 — ')+V.lv.toUpperCase();
+ if(!D || !D.rows || !D.rows.length){
+  $('per').textContent='Belum ada data di database';
+  $('kp').innerHTML='';$('ls').innerHTML='<div class="empty">Belum ada data untuk periode ini. Upload CSV untuk menambah.</div>';
+  type('Menunggu data...');
+  podium([],[]);
+  return;
+ }
+ $('per').textContent=D.period;
+ $('kp').innerHTML=D.total?`<div class="kpis"><div class="kpi"><small>TOTAL GMV</small><b>${rp(D.total.gmv)}</b></div><div class="kpi"><small>GROWTH</small><b class="${D.total.rate>=0?'up':'dn'}">${pc(D.total.rate)}</b></div></div>`:'';
+ const G=rk(D,'gmv'),R=rk(D,'rate');
+ $('ls').innerHTML='<div class="sub">GMV</div>'+lst(G,'gmv')+'<div class="sub" style="margin-top:12px">GROWTH RATE</div>'+lst(R,'rate');
+ type(insight(D,V.lv));podium(G.slice(0,3),R.slice(0,3));
+}
+
+// ---------- 3D RENDERER ----------
+let sc,cam,ren,grp,bars=[],ex=[],rings=[],cf,cfT=0,rotY=.2,rotX=.1,zf=1,drag=0,lx=0,ly=0,introT=0,flopM=0,bt;
+const RC=['#ffd54a','#dfe9f2','#e08a4a'];
+function mk(l1,col,w=3.8,h=1.7){const c=document.createElement('canvas');c.width=512;c.height=224;const x=c.getContext('2d'),t=new THREE.CanvasTexture(c);
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(w,h,1);
+ s.draw=v=>{x.clearRect(0,0,512,224);x.textAlign='center';x.fillStyle='rgba(4,12,28,.78)';x.fillRect(0,0,512,224);x.strokeStyle=col;x.lineWidth=4;x.strokeRect(2,2,508,220);x.fillStyle='#fff';x.font='bold 30px Arial';
+  let a='',b='';l1.split(' ').forEach(w=>{(a+' '+w).length<=18&&!b?a+=(a?' ':'')+w:b+=(b?' ':'')+w});x.fillText(a,256,v?60:125);if(b)x.fillText(b.length>20?b.slice(0,19)+'…':b,256,100);x.fillStyle=col;x.font='bold 44px Arial';x.fillText(v,256,170);t.needsUpdate=true};s.draw('');return s}
+function num(n,col){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.font='900 110px Arial Black,Arial';x.textAlign='center';x.fillStyle=col;x.shadowColor=col;x.shadowBlur=18;x.fillText(n,64,100);
+ return new THREE.Mesh(new THREE.PlaneGeometry(1.3,1.3),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true}))}
+function trophy(){const g=new THREE.Group(),M=new THREE.MeshStandardMaterial({color:0xffc83a,metalness:1,roughness:.2,emissive:0x553300,side:2});
+ const p=[[0,0],[.35,0],[.12,.15],[.1,.5],[.42,.9],[.55,1.15],[.48,1.15],[0,.95]].map(a=>new THREE.Vector2(a[0],a[1]));
+ g.add(new THREE.Mesh(new THREE.LatheGeometry(p,24),M));g.add(new THREE.Mesh(new THREE.TorusGeometry(.5,.03,8,32),new THREE.MeshBasicMaterial({color:0xffe27a})).translateY(1.15).rotateX(Math.PI/2));return g}
+function medal(i){const g=new THREE.Group(),m=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.08,32),new THREE.MeshStandardMaterial({color:i==1?0xdfe9f2:0xcd7f32,metalness:1,roughness:.25}));m.rotation.x=Math.PI/2;m.position.y=.5;g.add(m);return g}
+function init(){
+ const cv=$('cv');ren=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));
+ sc=new THREE.Scene();sc.fog=new THREE.FogExp2(0x040a16,.011);cam=new THREE.PerspectiveCamera(50,1,.1,100);
+ sc.add(new THREE.AmbientLight(0x6688aa,.8));const dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(4,8,6);sc.add(dl);
+ const pl=new THREE.PointLight(0x38d0ff,2.2,30);pl.position.set(0,6,4);sc.add(pl);
+ sc.add(new THREE.GridHelper(80,80,0x0a3a6e,0x08203d));
+ for(let r=7;r<=12;r++){const g=new THREE.Mesh(new THREE.RingGeometry(r,r+.05,96),new THREE.MeshBasicMaterial({color:0x38d0ff,transparent:true,opacity:.55-(r-7)*.08,side:2}));g.rotation.x=-Math.PI/2;g.position.y=.005;sc.add(g)}
+ for(let k=0;k<3;k++){const c=new THREE.Mesh(new THREE.CylinderGeometry(36+k*4,32+k*4,3,72,1,true),new THREE.MeshBasicMaterial({color:0x0b4a8a,wireframe:true,transparent:true,opacity:.3}));c.position.y=1.5+k*3;sc.add(c)}
+ window.eq=[];for(let i=0;i<56;i++){const a=i/56*Math.PI*2,r=26+(i%3)*1.6,m=new THREE.Mesh(new THREE.BoxGeometry(.8,1,.8),new THREE.MeshBasicMaterial({color:i%4?0x0082c3:0x38d0ff,transparent:true,opacity:.6}));m.position.set(Math.cos(a)*r,0,Math.sin(a)*r);m.ph=Math.random()*6;sc.add(m);eq.push(m)}
+ const W=(g,c)=>new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:c,wireframe:true})),G3=THREE.Group;
+ const mkS=[()=>W(new THREE.SphereGeometry(1.1,12,10),0xff8a3d),()=>W(new THREE.SphereGeometry(.7,10,8),0xc8ff3d),()=>W(new THREE.IcosahedronGeometry(1,1),0xffffff),
+  ()=>{const g=new G3();g.add(W(new THREE.TorusGeometry(.9,.08,6,24),0x38d0ff));const h=W(new THREE.CylinderGeometry(.07,.07,1.3,6),0x38d0ff);h.position.y=-1.5;g.add(h);return g},
+  ()=>{const g=new G3();g.add(W(new THREE.ConeGeometry(.6,1.2,8,1,true),0xffffff));const b=W(new THREE.SphereGeometry(.3,8,6),0xffd54a);b.position.y=-.8;g.add(b);return g},
+  ()=>W(new THREE.TorusGeometry(.9,.1,8,20),0xff4d6d)];
+ window.props=[];for(let i=0;i<14;i++){const o=mkS[i%6](),a=Math.PI*(1.05+.9*i/13),r=15+(i%3)*3;o.position.set(Math.cos(a)*r,3+(i%4)*2.2,Math.sin(a)*r);o.by=o.position.y;o.ph=i;sc.add(o);props.push(o)}
+ const pg=new THREE.BufferGeometry(),pa=[];for(let i=0;i<400;i++)pa.push((Math.random()-.5)*40,Math.random()*14,(Math.random()-.5)*40);
+ pg.setAttribute('position',new THREE.Float32BufferAttribute(pa,3));sc.add(window.pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0x38d0ff,size:.06})));
+ const N=260,g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(N*3),3));
+ cf=new THREE.Points(g,new THREE.PointsMaterial({size:.2,vertexColors:true}));cf.visible=false;cf.frustumCulled=false;sc.add(cf);cf.vel=new Float32Array(N*3);
+ grp=new THREE.Group();sc.add(grp);
+ const rs=()=>{const s=$('stage');ren.setSize(s.clientWidth,s.clientHeight,false);cam.aspect=s.clientWidth/s.clientHeight;cam.updateProjectionMatrix()};rs();addEventListener('resize',rs);new ResizeObserver(rs).observe($('stage'));
+ cv.onpointerdown=e=>{drag=1;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId)};cv.onpointerup=()=>drag=0;
+ cv.onpointermove=e=>{if(!drag)return;rotY+=(e.clientX-lx)*.008;rotX=Math.max(-.1,Math.min(.7,rotX+(e.clientY-ly)*.004));lx=e.clientX;ly=e.clientY};
+ cv.onwheel=e=>{e.preventDefault();zf=Math.max(.5,Math.min(1.4,zf+e.deltaY*.0008))};
+ const t0=performance.now();(function loop(){requestAnimationFrame(loop);const t=(performance.now()-t0)/1000,dt=.016;introT+=dt;
+  const e=1-Math.pow(1-Math.min(1,introT/2.8),3),base=(cam.aspect<1?21:13)*zf*(1+(1-e)*.7);
+  if(!drag)rotY+=.0012;grp.rotation.y=rotY+(1-e)*1.4;
+  cam.position.set(flopM&&Math.random()<.03?(Math.random()-.5)*.4:0,3+base*.3+rotX*10,base);cam.lookAt(0,2.2,0);pts.rotation.y=t*.02;
+  eq.forEach(m=>{const h=1+(Math.sin(t*1.5+m.ph)+1)*3.5;m.scale.y=h;m.position.y=h/2});props.forEach(o=>{o.rotation.y+=.012;o.rotation.x+=.006;o.position.y=o.by+Math.sin(t+o.ph)*.6});
+  rings.forEach((r,i)=>{r.scale.setScalar(1+.05*Math.sin(t*2+i));r.material.opacity=.5+.3*Math.sin(t*3+i)});
+  bars.forEach(b=>{b.age+=dt;const on=b.age>0;[b.m,b.top,b.lab,b.num].forEach(z=>z.visible=on);if(!on)return;
+   b.cur+=(b.h-b.cur)*.07;const p=Math.min(1,b.cur/b.h);
+   if(b.shown!=1){b.lab.draw(fv(b.val*p,b.met));if(p>.995){b.lab.draw(fv(b.val,b.met));b.shown=1}}
+   b.m.scale.y=Math.max(.01,b.cur);b.m.position.y=b.cur/2;b.num.position.y=b.cur*.5;b.top.position.y=b.cur+.15+Math.sin(t*2+b.x)*.12;b.top.rotation.y=t*1.5;b.lab.position.y=b.cur+(b.i?1.0:1.2);
+   b.m.material.emissiveIntensity=.3+(flopM&&Math.random()<.05?.9:0);b.m.position.x=b.x+(flopM&&Math.random()<.03?(Math.random()-.5)*.3:0)});
+  if(cfT>0){cfT-=dt;const P=cf.geometry.attributes.position.array,V2=cf.vel;for(let i=0;i<P.length;i+=3){P[i]+=V2[i];P[i+1]+=V2[i+1];P[i+2]+=V2[i+2];if(P[i+1]<0)P[i+1]=0}cf.geometry.attributes.position.needsUpdate=true;if(cfT<=0)cf.visible=false}
+  ren.render(sc,cam)})();
+}
+function burst(){if(!cf)return;const P=cf.geometry.attributes.position.array,C=cf.geometry.attributes.color.array,pal=flopM?[[1,.3,.4],[1,.6,.2],[.6,.1,.2]]:[[1,.84,.3],[.2,.8,1],[0,.51,.76],[1,1,1]];
+ for(let i=0;i<P.length;i+=3){P[i]=(Math.random()-.5)*20;P[i+1]=10+Math.random()*4;P[i+2]=(Math.random()-.5)*8;cf.vel[i]=(Math.random()-.5)*.04;cf.vel[i+1]=-(.03+Math.random()*.06);cf.vel[i+2]=(Math.random()-.5)*.03;const c=pal[Math.random()*pal.length|0];C[i]=c[0];C[i+1]=c[1];C[i+2]=c[2]}
+ cf.geometry.attributes.color.needsUpdate=true;cf.visible=true;cfT=5}
+function pod(items,ox,title,m){
+ const col=flopM?0xff4d6d:0x0082c3,hx=flopM?'#ff4d6d':'#38d0ff',S=[[0,3.4],[-2.6,2.4],[2.6,1.7]],add=o=>{grp.add(o);ex.push(o)};
+ const t=mk(title+(flopM?' ⚠':''),hx,3.4,1.5);t.position.set(ox,7.0,0);add(t);
+ const disc=new THREE.Mesh(new THREE.CircleGeometry(5.3,48),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.14}));disc.rotation.x=-Math.PI/2;disc.position.set(ox,.01,0);add(disc);
+ [5.3,5.7].forEach(r=>{const g=new THREE.Mesh(new THREE.RingGeometry(r,r+.07,64),new THREE.MeshBasicMaterial({color:col,transparent:true,side:2}));g.rotation.x=-Math.PI/2;g.position.set(ox,.03,0);add(g);rings.push(g)});
+ items.forEach((o,i)=>{const [x,h]=S[i],b={x:ox+x,h,cur:0,age:-[1.9,1.1,.4][i],val:m=='gmv'?o.gmv:o.rate,met:m,i};
+  b.m=new THREE.Mesh(new THREE.BoxGeometry(2,1,2),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.3,metalness:.7,roughness:.25}));
+  b.m.add(new THREE.LineSegments(new THREE.EdgesGeometry(b.m.geometry),new THREE.LineBasicMaterial({color:0xffffff})));b.m.position.x=b.x;
+  b.top=i?medal(i):trophy();b.top.position.x=b.x;b.lab=mk(o.name,hx);b.lab.position.x=b.x;b.num=num(i+1,RC[i]);b.num.position.set(b.x,0,1.03);
+  const beam=new THREE.Mesh(new THREE.ConeGeometry(1.4,12,24,1,true),new THREE.MeshBasicMaterial({color:i?0x66aaff:0xffd54a,transparent:true,opacity:.07,blending:THREE.AdditiveBlending,depthWrite:false,side:2}));beam.position.set(b.x,6,0);add(beam);
+  [b.m,b.top,b.lab,b.num].forEach(z=>{grp.add(z);ex.push(z)});bars.push(b)});
+}
+function podium(G,R){
+ if(!sc)return;ex.forEach(o=>grp.remove(o));bars=[];ex=[];rings=[];clearTimeout(bt);cfT=0;cf.visible=false;if(!G.length)return;
+ flopM=V.dir=='flop'?1:0;pod(V.met=='gmv'?G:R,0,V.met=='gmv'?'GMV':'GROWTH RATE',V.met);introT=0;bt=setTimeout(burst,2400);
+}
+
+// ---------- AI CHAT ----------
+function ans(q){q=q.toLowerCase();
+ const D=currentData;
+ if(!D||!D.rows||!D.rows.length)return 'Belum ada data '+V.lv+'. Upload CSV dulu ya.';
+ const G=[...D.rows].sort((a,b)=>b.gmv-a.gmv),R=[...D.rows].sort((a,b)=>b.rate-a.rate),L=a=>a.slice(0,3).map(o=>o.name+' ('+(a==G||a==Gr?rp(o.gmv):pc(o.rate))+')').join(', '),Gr=[...G].reverse(),Rr=[...R].reverse();
+ const hit=D.rows.find(o=>q.includes(o.name.toLowerCase()))||D.rows.find(o=>o.name.toLowerCase().split(' ').some(w=>w.length>4&&q.includes(w)));
+ if(hit)return `${hit.name}: GMV ${rp(hit.gmv)} (peringkat ${G.indexOf(hit)+1}/${G.length}), growth ${pc(hit.rate)} (peringkat ${R.indexOf(hit)+1}/${R.length}). ${hit.rate<0?'Sedang turun — cek stok, harga, dan promo.':'Tren positif — jaga ketersediaan stok.'}`;
+ if(/total|keseluruhan/.test(q))return D.total?`Total GMV ${rp(D.total.gmv)}, growth ${pc(D.total.rate)} (${D.period}).`:'Data total tidak tersedia.';
+ if(/flop|turun|jelek|rendah|terburuk|bawah/.test(q))return 'Growth terendah: '+L(Rr)+'.\nGMV terendah: '+L(Gr)+'.';
+ if(/growth|naik|tumbuh|melesat/.test(q))return 'Growth tertinggi: '+L(R)+'.';
+ if(/gmv|top|terbaik|juara|terbesar|jual/.test(q))return 'GMV terbesar: '+L(G)+'.';
+ if(/saran|rekomendasi|harus|action|apa/.test(q))return (insight(D,V.lv).split('💡')[1]||'').trim();
+ return 'Coba tanya: "top GMV", "growth tertinggi", "yang paling turun", "total", "saran", atau sebut nama produk.';}
+function say(t,u){const d=document.createElement('div');d.className='m'+(u?' u':'');d.textContent=t;$('cl').appendChild(d);$('cl').scrollTop=1e5}
+function ask(q){q=q.trim();if(!q)return;say(q,1);$('ci').value='';setTimeout(()=>say(ans(q)),350)}
+$('cs').onclick=()=>ask($('ci').value);$('ci').onkeydown=e=>{if(e.key=='Enter')ask($('ci').value)};
+document.querySelectorAll('.qc').forEach(b=>b.onclick=()=>ask(b.textContent));
+say('Hai! Aku DECA Coach 👋 Tanya apa saja soal data di Supabase.');
+
+// ---------- START SESSION ----------
+function startSession(session){
+ me = session.user;
+ const meta = me.user_metadata || {};
+ $('auth').classList.add('hide'); $('app').classList.remove('hide');$('me').innerHTML = `👤 <b>${me.email}</b> · ${meta.store || 'Store'} · ${meta.conso || 'Conso'}`;
+ $('up').onclick=()=>$('upc').classList.toggle('hide');
+ 
+ if(!ren) init();
+ loadPeriodsHistory();
+}
+
+// Auto check login session
+(async ()=>{
+ const { data } = await sb.auth.getSession();
+ if(data && data.session) startSession(data.session);
+})();
+</script></body></html>
